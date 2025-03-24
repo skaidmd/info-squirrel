@@ -3,10 +3,10 @@ import { getScrapeResultById } from '@/lib/db-service';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id, 10);
+    const id = parseInt(context.params.id, 10);
     
     if (isNaN(id)) {
       return NextResponse.json(
