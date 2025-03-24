@@ -110,7 +110,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com"
-          className={`flex-1 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          className={`flex-1 px-4 py-3 md:py-4 border rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 ${
             url && !isValidUrl ? 'border-red-500' : 'border-gray-300'
           }`}
           disabled={isLoading}
@@ -118,7 +118,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
         <button
           type="submit"
           disabled={isLoading || !isValidUrl}
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 md:py-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
         >
           {isLoading ? '処理中...' : initialSelectors ? '再スクレイピング' : 'スクレイピング'}
         </button>
@@ -166,7 +166,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
             </div>
           </div>
 
-          <div className="text-sm text-gray-700 mb-2">
+          <div className="text-sm md:text-base text-gray-700 mb-2">
             <p>CSSセレクターを使用して、Webページから特定の要素を抽出できます。</p>
             <p className="mt-1">例えば、<code className="bg-gray-100 px-1 rounded font-mono text-blue-700">h1</code>（見出し）、<code className="bg-gray-100 px-1 rounded font-mono text-blue-700">.class-name</code>（クラス）、<code className="bg-gray-100 px-1 rounded font-mono text-blue-700">#id-name</code>（ID）などが指定できます。</p>
           </div>
@@ -177,7 +177,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
               <ul className="space-y-2">
                 <li className="flex justify-between items-center">
                   <div>
-                    <p className="text-gray-800"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">h1</code> - メインタイトル</p>
+                    <p className="text-gray-800 md:text-base"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">h1</code> - メインタイトル</p>
                   </div>
                   <button
                     type="button"
@@ -189,7 +189,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
                 </li>
                 <li className="flex justify-between items-center">
                   <div>
-                    <p className="text-gray-800"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">meta[name=&quot;description&quot;]</code> - メタディスクリプション</p>
+                    <p className="text-gray-800 md:text-base"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">meta[name=&quot;description&quot;]</code> - メタディスクリプション</p>
                   </div>
                   <button
                     type="button"
@@ -201,7 +201,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
                 </li>
                 <li className="flex justify-between items-center">
                   <div>
-                    <p className="text-gray-800"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">.article-content</code> - 記事コンテンツ（クラス名による指定）</p>
+                    <p className="text-gray-800 md:text-base"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">.article-content</code> - 記事コンテンツ（クラス名による指定）</p>
                   </div>
                   <button
                     type="button"
@@ -213,7 +213,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
                 </li>
                 <li className="flex justify-between items-center">
                   <div>
-                    <p className="text-gray-800"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">#main-content</code> - メインコンテンツ（ID指定）</p>
+                    <p className="text-gray-800 md:text-base"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">#main-content</code> - メインコンテンツ（ID指定）</p>
                   </div>
                   <button
                     type="button"
@@ -225,7 +225,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
                 </li>
                 <li className="flex justify-between items-center">
                   <div>
-                    <p className="text-gray-800"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">div.price</code> - 価格情報（タグとクラス）</p>
+                    <p className="text-gray-800 md:text-base"><code className="bg-gray-100 px-1 rounded font-mono text-blue-700">div.price</code> - 価格情報（タグとクラス）</p>
                   </div>
                   <button
                     type="button"
@@ -248,24 +248,24 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
           {selectorFields.map((field) => (
             <div key={field.id} className="flex flex-col sm:flex-row gap-2 border-b border-gray-200 pb-4">
               <div className="flex-1">
-                <label className="block text-xs text-gray-700 mb-1">名前（キー）</label>
+                <label className="block text-xs md:text-sm text-gray-700 mb-1 font-medium">名前（キー）</label>
                 <input
                   type="text"
                   value={field.name}
                   onChange={(e) => updateSelectorField(field.id, 'name', e.target.value)}
                   placeholder="タイトル"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 md:py-3 border rounded-md text-sm md:text-base focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600"
                   disabled={isLoading}
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs text-gray-700 mb-1">CSSセレクター</label>
+                <label className="block text-xs md:text-sm text-gray-700 mb-1 font-medium">CSSセレクター</label>
                 <input
                   type="text"
                   value={field.selector}
                   onChange={(e) => updateSelectorField(field.id, 'selector', e.target.value)}
                   placeholder="h1.title"
-                  className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 md:py-3 border rounded-md text-sm md:text-base focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-600"
                   disabled={isLoading}
                 />
               </div>
@@ -286,15 +286,15 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
 
       {useSelectors && (
         <div className="mt-4 rounded-md p-4 bg-yellow-50 border border-yellow-200">
-          <h3 className="font-medium text-yellow-800 mb-2">セレクター活用のヒント</h3>
-          <ul className="list-disc pl-5 text-sm text-yellow-800 space-y-1">
+          <h3 className="font-medium text-yellow-800 mb-2 text-base md:text-lg">セレクター活用のヒント</h3>
+          <ul className="list-disc pl-5 text-sm md:text-base text-yellow-800 space-y-1">
             <li>よく使われるセレクター例をクリックすると、自動的にフォームに追加されます</li>
             <li>セレクターを複数指定すると、各要素を個別に抽出できます（例：タイトル、説明文、価格など）</li>
             <li>スクレイピング後に結果を確認し、セレクターを編集して再スクレイピングが可能です</li>
             <li>セレクターがマッチしない場合は空の結果が返されます</li>
           </ul>
-          <p className="mt-2 text-sm text-yellow-800">
-            <strong>応用例：</strong> ECサイトの商品ページから<code className="bg-yellow-100 px-1 rounded font-mono">.product-title</code>（商品名）、<code className="bg-yellow-100 px-1 rounded font-mono">.price</code>（価格）、<code className="bg-yellow-100 px-1 rounded font-mono">.description</code>（説明）などを抽出
+          <p className="mt-2 text-sm md:text-base text-yellow-800">
+            <strong>応用例：</strong> ECサイトの商品ページから<code className="bg-yellow-100 px-1 rounded font-mono text-yellow-800">.product-title</code>（商品名）、<code className="bg-yellow-100 px-1 rounded font-mono text-yellow-800">.price</code>（価格）、<code className="bg-yellow-100 px-1 rounded font-mono text-yellow-800">.description</code>（説明）などを抽出
           </p>
         </div>
       )}
