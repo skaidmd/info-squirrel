@@ -1,20 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getScrapeResultById } from '@/lib/db-service';
 
-interface RouteContext {
-  params: {
-    id: string;
-  }
-}
-
-export async function GET(
-  req: Request,
-  { params }: RouteContext
-): Promise<NextResponse> {
+export async function GET(request: Request) {
   try {
-    const id = parseInt(params.id, 10);
+    // URLからパラメータを抽出
+    const url = new URL(request.url);
+    const idParam = url.pathname.split('/').pop();
+    const id = idParam ? parseInt(idParam, 10) : null;
     
-    if (isNaN(id)) {
+    if (!id || isNaN(id)) {
       return NextResponse.json(
         { success: false, error: '有効なIDを指定してください' },
         { status: 400 }

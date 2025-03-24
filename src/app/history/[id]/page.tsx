@@ -2,21 +2,25 @@ import HistoryDetail from '@/components/HistoryDetail';
 
 export const dynamic = 'force-dynamic';
 
-type HistoryDetailPageProps = {
-  params: {
-    id: string;
-  };
-};
+interface PageParams {
+  id: string;
+}
 
-export async function generateMetadata({ params }: HistoryDetailPageProps) {
+interface PageProps {
+  params: Promise<PageParams>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { id } = await params;
   return {
-    title: `履歴詳細 #${params.id} - Info Squirrel`,
+    title: `履歴詳細 #${id} - Info Squirrel`,
     description: 'スクレイピング履歴の詳細を表示します',
   };
 }
 
-export default function HistoryDetailPage({ params }: HistoryDetailPageProps) {
-  const { id } = params;
+export default async function HistoryDetailPage({ params }: PageProps) {
+  const { id } = await params;
 
   return (
     <main className="flex min-h-screen flex-col items-center p-6 md:p-24 bg-gray-50">
