@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { SelectorDefinition } from '@/lib/scraper';
 
 type HistoryDetailProps = {
   id: string;
@@ -13,6 +14,7 @@ type HistoryItem = {
   status: string;
   error?: string;
   content?: string;
+  selectors?: string; // JSON文字列として保存されているセレクター情報
   createdAt: number;
   updatedAt: number;
 };
@@ -21,6 +23,8 @@ export default function HistoryDetail({ id }: HistoryDetailProps) {
   const [item, setItem] = useState<HistoryItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [parsedSelectors, setParsedSelectors] = useState<SelectorDefinition | null>(null);
+  const [parsedContent, setParsedContent] = useState<Record<string, string> | null>(null);
 
   useEffect(() => {
     const fetchHistoryDetail = async () => {
@@ -39,6 +43,27 @@ export default function HistoryDetail({ id }: HistoryDetailProps) {
         
         if (result.success) {
           setItem(result.data);
+          
+          // セレクター情報をパース
+          if (result.data.selectors) {
+            try {
+              const selectorsObj = JSON.parse(result.data.selectors);
+              setParsedSelectors(selectorsObj);
+            } catch (e) {
+              console.error('セレクター情報のパースに失敗:', e);
+            }
+          }
+          
+          // コンテンツがJSON形式の場合はパース
+          if (result.data.content && result.data.content.startsWith('{') && result.data.content.endsWith('}')) {
+            try {
+              const contentObj = JSON.parse(result.data.content);
+              setParsedContent(contentObj);
+            } catch (e) {
+              console.error('コンテンツのJSONパースに失敗:', e);
+              // パースに失敗した場合は通常のテキストとして扱う
+            }
+          }
         } else {
           setError(result.error || '履歴の取得に失敗しました');
         }
@@ -152,6 +177,19 @@ export default function HistoryDetail({ id }: HistoryDetailProps) {
           </div>
         </div>
         
+        {parsedSelectors && Object.keys(parsedSelectors).length > 0 && (
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-gray-500 mb-1">使用セレクター</h3>
+            <div className="bg-gray-50 p-3 rounded border border-gray-200">
+              {Object.entries(parsedSelectors).map(([key, value]) => (
+                <div key={key} className="mb-1">
+                  <span className="font-medium">{key}</span>: <code className="bg-gray-100 px-1 py-0.5 rounded">{value}</code>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {item.error && (
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-500 mb-1">エラー内容</h3>
@@ -164,9 +202,20 @@ export default function HistoryDetail({ id }: HistoryDetailProps) {
         {item.content && (
           <div>
             <h3 className="text-sm font-medium text-gray-500 mb-1">コンテンツ</h3>
-            <div className="bg-gray-50 p-4 rounded border border-gray-200 max-h-[400px] overflow-y-auto">
-              <pre className="whitespace-pre-wrap text-sm">{item.content}</pre>
-            </div>
+            {parsedContent ? (
+              <div className="bg-gray-50 p-4 rounded border border-gray-200 max-h-[400px] overflow-y-auto">
+                {Object.entries(parsedContent).map(([key, value]) => (
+                  <div key={key} className="mb-4 pb-4 border-b border-gray-200 last:border-b-0">
+                    <h3 className="font-bold text-blue-800">{key}</h3>
+                    <pre className="whitespace-pre-wrap text-sm mt-1">{value}</pre>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-gray-50 p-4 rounded border border-gray-200 max-h-[400px] overflow-y-auto">
+                <pre className="whitespace-pre-wrap text-sm">{item.content}</pre>
+              </div>
+            )}
           </div>
         )}
       </div>

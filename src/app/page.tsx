@@ -4,25 +4,31 @@ import { useState } from 'react';
 import Link from 'next/link';
 import UrlForm from '@/components/UrlForm';
 import ResultDisplay from '@/components/ResultDisplay';
-import { ScrapeResult } from '@/lib/scraper';
+import { ScrapeResult, SelectorDefinition } from '@/lib/scraper';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
   const [result, setResult] = useState<ScrapeResult | null>(null);
+  const [usedSelectors, setUsedSelectors] = useState<SelectorDefinition | null>(null);
+  const [editMode, setEditMode] = useState(false);
 
-  const handleSubmit = async (inputUrl: string) => {
+  const handleSubmit = async (inputUrl: string, selectors?: SelectorDefinition) => {
     try {
       setIsLoading(true);
       setUrl(inputUrl);
       setResult(null);
+      setUsedSelectors(selectors || null);
 
       const response = await fetch('/api/scrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ url: inputUrl }),
+        body: JSON.stringify({ 
+          url: inputUrl,
+          selectors
+        }),
       });
 
       if (!response.ok) {
@@ -64,7 +70,14 @@ export default function Home() {
         </div>
       </div>
 
-      <UrlForm onSubmit={handleSubmit} isLoading={isLoading} />
+      {!result || editMode ? (
+        <UrlForm 
+          onSubmit={handleSubmit} 
+          isLoading={isLoading} 
+          initialUrl={url || ''}
+          initialSelectors={editMode ? usedSelectors || undefined : undefined}
+        />
+      ) : null}
       
       {isLoading && (
         <div className="flex justify-center items-center mt-8">
@@ -72,7 +85,34 @@ export default function Home() {
         </div>
       )}
 
-      <ResultDisplay result={result} url={url} />
+      {result && !editMode && (
+        <>
+          <ResultDisplay result={result} url={url} selectors={usedSelectors} />
+          
+          {result.success && (
+            <div className="w-full max-w-3xl mx-auto mt-4">
+              <div className="flex flex-wrap gap-2 justify-center">
+                <button
+                  onClick={() => setEditMode(true)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 focus:outline-none"
+                >
+                  セレクターを編集して再スクレイピング
+                </button>
+                <button
+                  onClick={() => {
+                    setResult(null);
+                    setUrl(null);
+                    setUsedSelectors(null);
+                  }}
+                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 focus:outline-none"
+                >
+                  新しいURLでスクレイピング
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </main>
   );
 }

@@ -1,17 +1,31 @@
 import { db } from '@/db';
 import { scrapingHistory } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
+import { SelectorDefinition } from './scraper';
 
 /**
  * スクレイピング履歴を保存する
  */
-export async function saveScrapeResult(url: string, status: 'success' | 'error', content?: string, error?: string) {
+export async function saveScrapeResult(
+  url: string, 
+  status: 'success' | 'error', 
+  content?: string | Record<string, string>, 
+  error?: string,
+  selectors?: SelectorDefinition
+) {
   try {
+    // コンテンツが構造化データの場合はJSON文字列に変換
+    const contentStr = typeof content === 'object' ? JSON.stringify(content) : content;
+    
+    // セレクターが指定されている場合はJSON文字列に変換
+    const selectorsStr = selectors ? JSON.stringify(selectors) : null;
+    
     const result = await db.insert(scrapingHistory).values({
       url,
       status,
-      content,
+      content: contentStr,
       error,
+      selectors: selectorsStr,
       createdAt: new Date(),
       updatedAt: new Date(),
     }).returning({ id: scrapingHistory.id });

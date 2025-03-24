@@ -1,18 +1,24 @@
 import axios, { AxiosError } from 'axios';
 import * as cheerio from 'cheerio';
 
+// セレクター定義の型
+export type SelectorDefinition = {
+  [key: string]: string; // キー名: CSSセレクター文字列
+};
+
 export type ScrapeResult = {
   success: boolean;
-  data?: string;
+  data?: string | Record<string, string>; // 文字列または構造化データ
   error?: string;
 };
 
 /**
  * 指定されたURLのWEBページをスクレイピングする
  * @param url スクレイピング対象のURL
+ * @param selectors 取得したい要素のセレクター定義（オプション）
  * @returns スクレイピング結果
  */
-export async function scrapeUrl(url: string): Promise<ScrapeResult> {
+export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Promise<ScrapeResult> {
   try {
     // URLの形式をチェック
     if (!url.match(/^https?:\/\/.+/)) {
@@ -51,13 +57,37 @@ export async function scrapeUrl(url: string): Promise<ScrapeResult> {
     // HTMLのパース
     const $ = cheerio.load(response.data);
     
-    // テキストコンテンツを取得
-    const bodyText = $('body').text().trim();
-    
-    return {
-      success: true,
-      data: bodyText
-    };
+    // セレクターが指定されている場合は特定要素を抽出
+    if (selectors && Object.keys(selectors).length > 0) {
+      console.log(`セレクターに基づいてデータを抽出: ${Object.keys(selectors).length}個のセレクター`);
+      
+      const extractedData: Record<string, string> = {};
+      
+      // 各セレクターに対して要素を取得
+      for (const [key, selector] of Object.entries(selectors)) {
+        try {
+          const element = $(selector);
+          extractedData[key] = element.text().trim();
+          console.log(`セレクター「${key}」: ${extractedData[key].substring(0, 50)}${extractedData[key].length > 50 ? '...' : ''}`);
+        } catch (error) {
+          console.error(`セレクター「${key}」の抽出中にエラー:`, error);
+          extractedData[key] = '';
+        }
+      }
+      
+      return {
+        success: true,
+        data: extractedData
+      };
+    } else {
+      // セレクターが指定されていない場合は全テキストを取得
+      const bodyText = $('body').text().trim();
+      
+      return {
+        success: true,
+        data: bodyText
+      };
+    }
   } catch (error) {
     console.error('スクレイピングエラー詳細:', error);
     
