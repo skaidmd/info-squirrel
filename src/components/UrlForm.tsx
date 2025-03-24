@@ -110,7 +110,7 @@ export default function UrlForm({ onSubmit, isLoading, initialUrl = '', initialS
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com"
-          className={`flex-1 px-4 py-3 md:py-4 border rounded-md text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 ${
+          className={`flex-1 px-4 py-3 md:py-4 border rounded-md text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-300 ${
             url && !isValidUrl ? 'border-red-500' : 'border-gray-300'
           }`}
           disabled={isLoading}
