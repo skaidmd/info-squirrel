@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 import { getScrapeResultById } from '@/lib/db-service';
 
+interface RouteContext {
+  params: {
+    id: string;
+  }
+}
+
 export async function GET(
-  request: Request,
-  context: { params: { id: string } }
-) {
+  req: Request,
+  { params }: RouteContext
+): Promise<NextResponse> {
   try {
-    const id = parseInt(context.params.id, 10);
+    const id = parseInt(params.id, 10);
     
     if (isNaN(id)) {
       return NextResponse.json(
