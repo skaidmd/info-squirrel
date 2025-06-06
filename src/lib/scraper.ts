@@ -66,9 +66,24 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
       // 各セレクターに対して要素を取得
       for (const [key, selector] of Object.entries(selectors)) {
         try {
-          const element = $(selector);
-          extractedData[key] = element.text().trim();
-          console.log(`セレクター「${key}」: ${extractedData[key].substring(0, 50)}${extractedData[key].length > 50 ? '...' : ''}`);
+          const element = $(selector).first();
+          let value = element.text().trim();
+
+          // metaタグなどテキストを持たない要素用にcontentやvalue属性も取得
+          if (!value) {
+            const contentAttr = element.attr('content');
+            const valueAttr = element.attr('value');
+            if (contentAttr !== undefined) {
+              value = contentAttr.trim();
+            } else if (valueAttr !== undefined) {
+              value = valueAttr.trim();
+            }
+          }
+
+          extractedData[key] = value;
+          console.log(
+            `セレクター「${key}」: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`
+          );
         } catch (error) {
           console.error(`セレクター「${key}」の抽出中にエラー:`, error);
           extractedData[key] = '';
