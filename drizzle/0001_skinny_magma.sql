@@ -1,1 +1,0 @@
-ALTER TABLE `scraping_history` ADD `selectors` text;

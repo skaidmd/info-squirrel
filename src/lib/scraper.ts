@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import * as cheerio from 'cheerio';
+import { AnyNode } from 'cheerio';
 
 // セレクター定義の型
 export type SelectorDefinition = {
@@ -61,10 +62,10 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
     $('script, style, meta, link, noscript').remove();
     
     // 自然言語テキストと要素を抽出する関数
-    const extractTextWithTags = (elements: cheerio.Cheerio<Element>) => {
+    const extractTextWithTags = (elements: cheerio.Cheerio<AnyNode>) => {
       const results: string[] = [];
       
-      elements.each(function(this: cheerio.Element) {
+      elements.each(function(this: AnyNode) {
         // 要素のタグ名を取得
         const tagName = this.tagName?.toLowerCase() || 'span';
         
@@ -77,7 +78,7 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
         }
         
         // 子要素も再帰的に処理
-        $(this).children().each(function(this: cheerio.Element) {
+        $(this).children().each(function(this: AnyNode) {
           const childTagName = this.tagName?.toLowerCase() || 'span';
           const childOwnText = $(this).clone().children().remove().end().text().trim();
           
