@@ -1,6 +1,5 @@
 import axios, { AxiosError } from 'axios';
 import * as cheerio from 'cheerio';
-import { Element } from 'cheerio';
 
 // セレクター定義の型
 export type SelectorDefinition = {
