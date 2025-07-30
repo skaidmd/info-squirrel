@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "migrate": "drizzle-kit generate:sqlite",
+    "studio": "drizzle-kit studio"
+  }
+} 
