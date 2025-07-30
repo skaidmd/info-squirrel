@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getScrapeResultById } from '@/lib/db-service';
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    // URLからパラメータを抽出
-    const url = new URL(request.url);
-    const idParam = url.pathname.split('/').pop();
-    const id = idParam ? parseInt(idParam, 10) : null;
+    // パラメータからIDを取得
+    const id = parseInt(params.id, 10);
     
     if (!id || isNaN(id)) {
       return NextResponse.json(

@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import * as cheerio from 'cheerio';
-import { AnyNode } from 'cheerio';
+import { Element } from 'cheerio';
 
 // セレクター定義の型
 export type SelectorDefinition = {
@@ -62,12 +62,12 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
     $('script, style, meta, link, noscript').remove();
     
     // 自然言語テキストと要素を抽出する関数
-    const extractTextWithTags = (elements: cheerio.Cheerio<AnyNode>) => {
+    const extractTextWithTags = (elements: cheerio.Cheerio<Element>) => {
       const results: string[] = [];
       
-      elements.each(function(this: AnyNode) {
+      elements.each(function(this: cheerio.Element) {
         // 要素のタグ名を取得
-        const tagName = (this as any).tagName?.toLowerCase() || 'span';
+        const tagName = this.tagName?.toLowerCase() || 'span';
         
         // 子要素を含まない、自分自身のテキストノードだけを取得
         const ownText = $(this).clone().children().remove().end().text().trim();
@@ -78,8 +78,8 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
         }
         
         // 子要素も再帰的に処理
-        $(this).children().each(function(this: AnyNode) {
-          const childTagName = (this as any).tagName?.toLowerCase() || 'span';
+        $(this).children().each(function(this: cheerio.Element) {
+          const childTagName = this.tagName?.toLowerCase() || 'span';
           const childOwnText = $(this).clone().children().remove().end().text().trim();
           
           if (childOwnText && childOwnText.length > 0) {
