@@ -100,6 +100,7 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
       // 各セレクターに対して要素を取得
       for (const [key, selector] of Object.entries(selectors)) {
         try {
+
           const elements = $(selector);
           
           if (elements.length > 0) {
@@ -113,6 +114,8 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
           } else {
             extractedData[key] = '';
           }
+
+
         } catch (error) {
           console.error(`セレクター「${key}」の抽出中にエラー:`, error);
           extractedData[key] = '';
