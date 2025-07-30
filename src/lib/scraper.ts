@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import * as cheerio from 'cheerio';
+import { AnyNode } from 'cheerio';
 
 // セレクター定義の型
 export type SelectorDefinition = {
@@ -57,6 +58,39 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
     // HTMLのパース
     const $ = cheerio.load(response.data);
     
+    // 不要なタグを削除（スクリプト、スタイル、メタ情報など）
+    $('script, style, meta, link, noscript').remove();
+    
+    // 自然言語テキストと要素を抽出する関数
+    const extractTextWithTags = (elements: cheerio.Cheerio<AnyNode>) => {
+      const results: string[] = [];
+      
+      elements.each(function(this: AnyNode) {
+        // 要素のタグ名を取得
+        const tagName = (this as any).tagName?.toLowerCase() || 'span';
+        
+        // 子要素を含まない、自分自身のテキストノードだけを取得
+        const ownText = $(this).clone().children().remove().end().text().trim();
+        
+        // テキストが存在する場合のみ追加
+        if (ownText && ownText.length > 0) {
+          results.push(`<${tagName}>${ownText}`);
+        }
+        
+        // 子要素も再帰的に処理
+        $(this).children().each(function(this: AnyNode) {
+          const childTagName = (this as any).tagName?.toLowerCase() || 'span';
+          const childOwnText = $(this).clone().children().remove().end().text().trim();
+          
+          if (childOwnText && childOwnText.length > 0) {
+            results.push(`<${childTagName}>${childOwnText}`);
+          }
+        });
+      });
+      
+      return results;
+    };
+    
     // セレクターが指定されている場合は特定要素を抽出
     if (selectors && Object.keys(selectors).length > 0) {
       console.log(`セレクターに基づいてデータを抽出: ${Object.keys(selectors).length}個のセレクター`);
@@ -66,9 +100,19 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
       // 各セレクターに対して要素を取得
       for (const [key, selector] of Object.entries(selectors)) {
         try {
-          const element = $(selector);
-          extractedData[key] = element.text().trim();
-          console.log(`セレクター「${key}」: ${extractedData[key].substring(0, 50)}${extractedData[key].length > 50 ? '...' : ''}`);
+          const elements = $(selector);
+          
+          if (elements.length > 0) {
+            const extractedTexts = extractTextWithTags(elements);
+            
+            // 結果をマージして重複を排除
+            const uniqueTexts = [...new Set(extractedTexts)].join('\n');
+            extractedData[key] = uniqueTexts;
+            
+            console.log(`セレクター「${key}」: ${extractedData[key].substring(0, 50)}${extractedData[key].length > 50 ? '...' : ''}`);
+          } else {
+            extractedData[key] = '';
+          }
         } catch (error) {
           console.error(`セレクター「${key}」の抽出中にエラー:`, error);
           extractedData[key] = '';
@@ -80,12 +124,15 @@ export async function scrapeUrl(url: string, selectors?: SelectorDefinition): Pr
         data: extractedData
       };
     } else {
-      // セレクターが指定されていない場合は全テキストを取得
-      const bodyText = $('body').text().trim();
+      // セレクターが指定されていない場合は自然言語テキストを抽出
+      const extractedTexts = extractTextWithTags($('body *'));
+      
+      // 重複を除去し、結果をマージ
+      const uniqueTexts = [...new Set(extractedTexts)].join('\n');
       
       return {
         success: true,
-        data: bodyText
+        data: uniqueTexts
       };
     }
   } catch (error) {
