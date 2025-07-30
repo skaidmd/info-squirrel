@@ -58,7 +58,7 @@ export default function Home() {
           Info Squirrel
         </h1>
         <p className="text-lg text-gray-600 mb-6">
-          URLを入力してWebページをスクレイピングしましょう
+          URLを入力してWebページを素早くスクレイピングしましょう！
         </p>
         <div className="flex justify-center">
           <Link 
